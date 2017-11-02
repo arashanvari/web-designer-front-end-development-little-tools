@@ -1,3 +1,24 @@
+/*
+ * @Author: 芥末/Vivapercuore 
+ * @Date: 2017-11-02 15:44:00 
+ * @Last Modified by:   芥末/Vivapercuore 
+ * @Last Modified time: 2017-11-02 15:44:00 
+ */
+
+
+/*  
+
+    <script type="application/javascript" src="js/fastclick.js"></script>
+    <script type="application/javascript">
+        window.addEventListener('load', function() {
+            FastClick.attach(document.body);
+        }, false);
+    </script>
+
+*/
+
+
+
 (function() {
     'use strict';
 
