@@ -1,12 +1,12 @@
  /*
-                       
-                       
-                       
-                                                     vivapercuore的小工具槽
-                       
-                       
-                       
-                    */
+                        
+                        
+                        
+                                                      vivapercuore的小工具槽
+                        
+                        
+                        
+                     */
 
 
  //获取滚动值
@@ -397,5 +397,37 @@
              theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
          }
      }
-     return theRequest;
+     return theRequest; //返回一个对象，包含所有键值对
  }
+
+ function getUrlArgObject() {
+    var args = new Object();
+    var query = location.search.substring(1); //获取查询串    
+    var pairs = query.split(","); //在逗号处断开    
+    for (var i = 0; i < pairs.length; i++) {
+        var pos = pairs[i].indexOf('='); //查找name=value    
+        if (pos == -1) { //如果没有找到就跳过    
+            continue;
+        }
+        var argname = pairs[i].substring(0, pos); //提取name    
+        var value = pairs[i].substring(pos + 1); //提取value    
+        args[argname] = unescape(value); //存为属性    
+    }
+    return args; //返回对象    
+}
+
+
+function link() {
+    var u = navigator.userAgent;
+    var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1; //android终端
+    var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+    var dowloadlink = ""
+    if (isAndroid) {
+        dowloadlink = "http://a.app.qq.com/o/simple.jsp?pkgname=com.xigua100.infoflow&ckey=CK1380654933226"
+    } else if (isiOS) {
+        dowloadlink = "https://itunes.apple.com/cn/app/id1274851342?mt=8"
+    } else {
+        console.log(u)
+    }
+    return dowloadlink
+}
