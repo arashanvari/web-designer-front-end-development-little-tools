@@ -1,17 +1,31 @@
  /*
-                        
-                        
-                        
-                                                      vivapercuore的小工具槽
-                        
-                        
-                        
-                     */
+                                                    
+                                                    
+                                                    
+                                                                                  vivapercuore的小工具槽
+                                                    
+                                                    
+                                                    
+                                                 */
+
+ /*
+ <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+ 禁止运行运营商插入js
+ <meta http-equiv="Content-Security-Policy" content="script-src 'self'">
+ 禁止百度转码
+ <meta http-equiv="Cache-Control" content="no-transform" />
+ <meta name="applicable-device" content="pc,mobile">
+ <meta name="MobileOptimized" content="width"/>
+ <meta name="HandheldFriendly" content="true"/>
+ <meta http-equiv="Cache-Control" content="no-siteapp" />
+ */
+
+
 
 
  //获取滚动值
  function getscroll() {
-     scrollh = document.getElementById("body").scrollTop
+     scrollh = window.scrollY
      return scrollh
  }
  //获取滚动值
@@ -49,13 +63,6 @@
  }
  //--------------------------------------------判断是pc还是手机--------------------------------------------
 
-
- //--------------------------------------------简化选择器--------------------------------------------
- function getid(id) { //简化选择器
-     var duixiang = window.document.getElementById(id)
-     return duixiang
- }
- //--------------------------------------------简化选择器--------------------------------------------
 
 
 
@@ -110,7 +117,17 @@
  }
  //--------------------------------------------获取元素的左上角在页面中距离整个页面顶端和左边的距离--------------------------------------------
 
-
+ function getElementBottom(element) {　　
+     var actualTop = element.offsetTop;　　
+     var current = element.offsetParent;　　
+     while (current !== null) {　　　　
+         actualTop += current.offsetTop;　　　　
+         current = current.offsetParent;　　
+     }　　
+     actualTop += element.offsetHeight
+     return actualTop;
+ }
+ //--------------------------------------------获取元素的底部离页面顶端的距离--------------------------------------------
 
 
 
@@ -178,6 +195,10 @@
  });
  */
  //--------------------------------------------封装原生ajax--------------------------------------------
+
+
+ var charset = document.characterSet ? document.characterSet : document.charset;
+ //判读网页编码
 
 
  //----------------------检测是否微信----------------------------
@@ -388,7 +409,7 @@
 
 
  function GetRequest() {
-     var url = location.search; //获取url中"?"符后的字串   
+     var url = decodeURI(location.search); //获取url中"?"符后的字串    
      var theRequest = new Object();
      if (url.indexOf("?") != -1) {
          var str = url.substr(1);
@@ -400,34 +421,709 @@
      return theRequest; //返回一个对象，包含所有键值对
  }
 
- function getUrlArgObject() {
-    var args = new Object();
-    var query = location.search.substring(1); //获取查询串    
-    var pairs = query.split(","); //在逗号处断开    
-    for (var i = 0; i < pairs.length; i++) {
-        var pos = pairs[i].indexOf('='); //查找name=value    
-        if (pos == -1) { //如果没有找到就跳过    
-            continue;
-        }
-        var argname = pairs[i].substring(0, pos); //提取name    
-        var value = pairs[i].substring(pos + 1); //提取value    
-        args[argname] = unescape(value); //存为属性    
-    }
-    return args; //返回对象    
-}
+ //GET URL 取参为对象
 
 
-function link() {
-    var u = navigator.userAgent;
-    var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1; //android终端
-    var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
-    var dowloadlink = ""
-    if (isAndroid) {
-        dowloadlink = "http://a.app.qq.com/o/simple.jsp?pkgname=com.xigua100.infoflow&ckey=CK1380654933226"
-    } else if (isiOS) {
-        dowloadlink = "https://itunes.apple.com/cn/app/id1274851342?mt=8"
-    } else {
-        console.log(u)
-    }
-    return dowloadlink
-}
+ function link() {
+     var u = navigator.userAgent;
+     var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1; //android终端
+     var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+     var dowloadlink = ""
+     if (isAndroid) {
+         dowloadlink = "http://a.app.qq.com/o/simple.jsp?pkgname=com.xigua100.infoflow&ckey=CK1380654933226"
+     } else if (isiOS) {
+         dowloadlink = "https://itunes.apple.com/cn/app/id1274851342?mt=8"
+     } else {
+         console.log(u)
+     }
+     return dowloadlink
+ } // 设备分类型跳转
+
+
+ function DownloadFile(fileName, content) { //直接下载文件  传入  文件名  ，内容  请自行改造blob部分
+     var aTag = document.createElement('a');
+     var blob = new Blob([content]);
+     aTag.download = fileName;
+     aTag.href = URL.createObjectURL(blob);
+     aTag.click();
+     URL.revokeObjectURL(blob);
+ }
+
+
+ //获取标签中的属性
+ getAttribute()
+     //略 
+ setAttribute()
+
+
+
+ //图片的异步加载
+
+ var imgs = document.getElementsByTagName("img");
+
+ bindEvent(window, 'scroll', lazyload);
+ lazyload();
+
+ function lazyload() {
+     forEach(imgs, function(img, i) {
+         if (!img || img.src) { return; }
+         var t = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+         var h = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+         var ot = getAbsPoint(img).y;
+         if (h + t < ot || t > ot + img.offsetHeight) {
+             return;
+         }
+         var url = img.getAttribute("data-src");
+         if (!img.src && url) {
+             img.src = url;
+         }
+     });
+ }
+
+ function getAbsPoint(o) {
+     var x = o.offsetLeft;
+     var y = o.offsetTop;
+     while (o = o.offsetParent) {
+         x += o.offsetLeft;
+         y += o.offsetTop
+     }
+     return {
+         'x': x,
+         'y': y
+     };
+ }
+
+ function bindEvent(obj, evt, fun) {
+     if (window.addEventListener) {
+         obj.addEventListener(evt, function(e) { fun(e); }, false);
+     } else {
+         obj.attachEvent('on' + evt, fun);
+     }
+ }
+
+ function forEach(array, callback, thisObject) {
+     if (array.forEach) {
+         array.forEach(callback, thisObject)
+     } else {
+         for (var i = 0, len = array.length; i < len; i++) {
+             callback.call(thisObject, array[i], i, array)
+         }
+     }
+ };
+
+
+
+ //图片的异步加载
+
+
+ /*  
+ 有趣的UA分离代码
+
+ */
+ "use strict";
+ var LIBVERSION = "0.7.7",
+     EMPTY = "",
+     UNKNOWN = "?",
+     FUNC_TYPE = "function",
+     UNDEF_TYPE = "undefined",
+     OBJ_TYPE = "object",
+     STR_TYPE = "string",
+     MAJOR = "major",
+     MODEL = "model",
+     NAME = "name",
+     TYPE = "type",
+     VENDOR = "vendor",
+     VERSION = "version",
+     ARCHITECTURE = "architecture",
+     CONSOLE = "console",
+     MOBILE = "mobile",
+     TABLET = "tablet",
+     SMARTTV = "smarttv",
+     WEARABLE = "wearable",
+     EMBEDDED = "embedded";
+ var util = {
+     extend: function(regexes, extensions) {
+         for (var i in extensions) {
+             if ("browser cpu device engine os".indexOf(i) !== -1 && extensions[i].length % 2 === 0) {
+                 regexes[i] = extensions[i].concat(regexes[i])
+             }
+         }
+         return regexes
+     },
+     has: function(str1, str2) {
+         if (typeof str1 === "string") {
+             return str2.toLowerCase().indexOf(str1.toLowerCase()) !== -1
+         } else {
+             return false
+         }
+     },
+     lowerize: function(str) {
+         return str.toLowerCase()
+     },
+     major: function(version) {
+         return typeof version === STR_TYPE ? version.split(".")[0] : undefined
+     }
+ };
+ var mapper = {
+     rgx: function() {
+         var result, i = 0,
+             j, k, p, q, matches, match, args = arguments;
+         while (i < args.length && !matches) {
+             var regex = args[i],
+                 props = args[i + 1];
+             if (typeof result === UNDEF_TYPE) { result = {}; for (p in props) { q = props[p]; if (typeof q === OBJ_TYPE) { result[q[0]] = undefined } else { result[q] = undefined } } }
+             j = k = 0;
+             while (j < regex.length && !matches) {
+                 matches = regex[j++].exec(this.getUA());
+                 if (!!matches) {
+                     for (p = 0; p < props.length; p++) {
+                         match = matches[++k];
+                         q = props[p];
+                         if (typeof q === OBJ_TYPE && q.length > 0) { if (q.length == 2) { if (typeof q[1] == FUNC_TYPE) { result[q[0]] = q[1].call(this, match) } else { result[q[0]] = q[1] } } else if (q.length == 3) { if (typeof q[1] === FUNC_TYPE && !(q[1].exec && q[1].test)) { result[q[0]] = match ? q[1].call(this, match, q[2]) : undefined } else { result[q[0]] = match ? match.replace(q[1], q[2]) : undefined } } else if (q.length == 4) { result[q[0]] = match ? q[3].call(this, match.replace(q[1], q[2])) : undefined } } else { result[q] = match ? match : undefined }
+                     }
+                 }
+             }
+             i += 2
+         }
+         return result
+     },
+     str: function(str, map) { for (var i in map) { if (typeof map[i] === OBJ_TYPE && map[i].length > 0) { for (var j = 0; j < map[i].length; j++) { if (util.has(map[i][j], str)) { return i === UNKNOWN ? undefined : i } } } else if (util.has(map[i], str)) { return i === UNKNOWN ? undefined : i } } return str }
+ };
+ var maps = { browser: { oldsafari: { version: { "1.0": "/8", 1.2: "/1", 1.3: "/3", "2.0": "/412", "2.0.2": "/416", "2.0.3": "/417", "2.0.4": "/419", "?": "/" } } }, device: { amazon: { model: { "Fire Phone": ["SD", "KF"] } }, sprint: { model: { "Evo Shift 4G": "7373KT" }, vendor: { HTC: "APA", Sprint: "Sprint" } } }, os: { windows: { version: { ME: "4.90", "NT 3.11": "NT3.51", "NT 4.0": "NT4.0", 2000: "NT 5.0", XP: ["NT 5.1", "NT 5.2"], Vista: "NT 6.0", 7: "NT 6.1", 8: "NT 6.2", 8.1: "NT 6.3", 10: ["NT 6.4", "NT 10.0"], RT: "ARM" } } } };
+ var regexes = {
+     browser: [
+         [/(opera\smini)\/([\w\.-]+)/i, /(opera\s[mobiletab]+).+version\/([\w\.-]+)/i, /(opera).+version\/([\w\.]+)/i, /(opera)[\/\s]+([\w\.]+)/i],
+         [NAME, VERSION],
+         [/\s(opr)\/([\w\.]+)/i],
+         [
+             [NAME, "Opera"], VERSION
+         ],
+         [/(kindle)\/([\w\.]+)/i, /(lunascape|maxthon|netfront|jasmine|blazer)[\/\s]?([\w\.]+)*/i, /(avant\s|iemobile|slim|baidu)(?:browser)?[\/\s]?([\w\.]*)/i, /(?:ms|\()(ie)\s([\w\.]+)/i, /(rekonq)\/([\w\.]+)*/i, /(chromium|flock|rockmelt|midori|epiphany|silk|skyfire|ovibrowser|bolt|iron|vivaldi)\/([\w\.-]+)/i],
+         [NAME, VERSION],
+         [/(trident).+rv[:\s]([\w\.]+).+like\sgecko/i, /(Edge)\/((\d+)?[\w\.]+)/i],
+         [
+             [NAME, "IE"], VERSION
+         ],
+         [/(yabrowser)\/([\w\.]+)/i],
+         [
+             [NAME, "Yandex"], VERSION
+         ],
+         [/(comodo_dragon)\/([\w\.]+)/i],
+         [
+             [NAME, /_/g, " "], VERSION
+         ],
+         [/(chrome|omniweb|arora|[tizenoka]{5}\s?browser)\/v?([\w\.]+)/i, /(uc\s?browser|qqbrowser)[\/\s]?([\w\.]+)/i],
+         [NAME, VERSION],
+         [/(dolfin)\/([\w\.]+)/i],
+         [
+             [NAME, "Dolphin"], VERSION
+         ],
+         [/((?:android.+)crmo|crios)\/([\w\.]+)/i],
+         [
+             [NAME, "Chrome"], VERSION
+         ],
+         [/XiaoMi\/MiuiBrowser\/([\w\.]+)/i],
+         [VERSION, [NAME, "MIUI Browser"]],
+         [/android.+version\/([\w\.]+)\s+(?:mobile\s?safari|safari)/i],
+         [VERSION, [NAME, "Android Browser"]],
+         [/FBAV\/([\w\.]+);/i],
+         [VERSION, [NAME, "Facebook"]],
+         [/version\/([\w\.]+).+?mobile\/\w+\s(safari)/i],
+         [VERSION, [NAME, "Mobile Safari"]],
+         [/version\/([\w\.]+).+?(mobile\s?safari|safari)/i],
+         [VERSION, NAME],
+         [/webkit.+?(mobile\s?safari|safari)(\/[\w\.]+)/i],
+         [NAME, [VERSION, mapper.str, maps.browser.oldsafari.version]],
+         [/(konqueror)\/([\w\.]+)/i, /(webkit|khtml)\/([\w\.]+)/i],
+         [NAME, VERSION],
+         [/(navigator|netscape)\/([\w\.-]+)/i],
+         [
+             [NAME, "Netscape"], VERSION
+         ],
+         [/(swiftfox)/i, /(icedragon|iceweasel|camino|chimera|fennec|maemo\sbrowser|minimo|conkeror)[\/\s]?([\w\.\+]+)/i, /(firefox|seamonkey|k-meleon|icecat|iceape|firebird|phoenix)\/([\w\.-]+)/i, /(mozilla)\/([\w\.]+).+rv\:.+gecko\/\d+/i, /(polaris|lynx|dillo|icab|doris|amaya|w3m|netsurf)[\/\s]?([\w\.]+)/i, /(links)\s\(([\w\.]+)/i, /(gobrowser)\/?([\w\.]+)*/i, /(ice\s?browser)\/v?([\w\._]+)/i, /(mosaic)[\/\s]([\w\.]+)/i],
+         [NAME, VERSION]
+     ],
+     cpu: [
+         [/(?:(amd|x(?:(?:86|64)[_-])?|wow|win)64)[;\)]/i],
+         [
+             [ARCHITECTURE, "amd64"]
+         ],
+         [/(ia32(?=;))/i],
+         [
+             [ARCHITECTURE, util.lowerize]
+         ],
+         [/((?:i[346]|x)86)[;\)]/i],
+         [
+             [ARCHITECTURE, "ia32"]
+         ],
+         [/windows\s(ce|mobile);\sppc;/i],
+         [
+             [ARCHITECTURE, "arm"]
+         ],
+         [/((?:ppc|powerpc)(?:64)?)(?:\smac|;|\))/i],
+         [
+             [ARCHITECTURE, /ower/, "", util.lowerize]
+         ],
+         [/(sun4\w)[;\)]/i],
+         [
+             [ARCHITECTURE, "sparc"]
+         ],
+         [/((?:avr32|ia64(?=;))|68k(?=\))|arm(?:64|(?=v\d+;))|(?=atmel\s)avr|(?:irix|mips|sparc)(?:64)?(?=;)|pa-risc)/i],
+         [
+             [ARCHITECTURE, util.lowerize]
+         ]
+     ],
+     device: [
+         [/\((ipad|playbook);[\w\s\);-]+(rim|apple)/i],
+         [MODEL, VENDOR, [TYPE, TABLET]],
+         [/applecoremedia\/[\w\.]+ \((ipad)/],
+         [MODEL, [VENDOR, "Apple"],
+             [TYPE, TABLET]
+         ],
+         [/(apple\s{0,1}tv)/i],
+         [
+             [MODEL, "Apple TV"],
+             [VENDOR, "Apple"]
+         ],
+         [/(archos)\s(gamepad2?)/i, /(hp).+(touchpad)/i, /(kindle)\/([\w\.]+)/i, /\s(nook)[\w\s]+build\/(\w+)/i, /(dell)\s(strea[kpr\s\d]*[\dko])/i],
+         [VENDOR, MODEL, [TYPE, TABLET]],
+         [/(kf[A-z]+)\sbuild\/[\w\.]+.*silk\//i],
+         [MODEL, [VENDOR, "Amazon"],
+             [TYPE, TABLET]
+         ],
+         [/(sd|kf)[0349hijorstuw]+\sbuild\/[\w\.]+.*silk\//i],
+         [
+             [MODEL, mapper.str, maps.device.amazon.model],
+             [VENDOR, "Amazon"],
+             [TYPE, MOBILE]
+         ],
+         [/\((ip[honed|\s\w*]+);.+(apple)/i],
+         [MODEL, VENDOR, [TYPE, MOBILE]],
+         [/\((ip[honed|\s\w*]+);/i],
+         [MODEL, [VENDOR, "Apple"],
+             [TYPE, MOBILE]
+         ],
+         [/(blackberry)[\s-]?(\w+)/i, /(blackberry|benq|palm(?=\-)|sonyericsson|acer|asus|dell|huawei|meizu|motorola|polytron)[\s_-]?([\w-]+)*/i, /(hp)\s([\w\s]+\w)/i, /(asus)-?(\w+)/i],
+         [VENDOR, MODEL, [TYPE, MOBILE]],
+         [/\(bb10;\s(\w+)/i],
+         [MODEL, [VENDOR, "BlackBerry"],
+             [TYPE, MOBILE]
+         ],
+         [/android.+(transfo[prime\s]{4,10}\s\w+|eeepc|slider\s\w+|nexus 7)/i],
+         [MODEL, [VENDOR, "Asus"],
+             [TYPE, TABLET]
+         ],
+         [/(sony)\s(tablet\s[ps])\sbuild\//i, /(sony)?(?:sgp.+)\sbuild\//i],
+         [
+             [VENDOR, "Sony"],
+             [MODEL, "Xperia Tablet"],
+             [TYPE, TABLET]
+         ],
+         [/(?:sony)?(?:(?:(?:c|d)\d{4})|(?:so[-l].+))\sbuild\//i],
+         [
+             [VENDOR, "Sony"],
+             [MODEL, "Xperia Phone"],
+             [TYPE, MOBILE]
+         ],
+         [/\s(ouya)\s/i, /(nintendo)\s([wids3u]+)/i],
+         [VENDOR, MODEL, [TYPE, CONSOLE]],
+         [/android.+;\s(shield)\sbuild/i],
+         [MODEL, [VENDOR, "Nvidia"],
+             [TYPE, CONSOLE]
+         ],
+         [/(playstation\s[3portablevi]+)/i],
+         [MODEL, [VENDOR, "Sony"],
+             [TYPE, CONSOLE]
+         ],
+         [/(sprint\s(\w+))/i],
+         [
+             [VENDOR, mapper.str, maps.device.sprint.vendor],
+             [MODEL, mapper.str, maps.device.sprint.model],
+             [TYPE, MOBILE]
+         ],
+         [/(lenovo)\s?(S(?:5000|6000)+(?:[-][\w+]))/i],
+         [VENDOR, MODEL, [TYPE, TABLET]],
+         [/(htc)[;_\s-]+([\w\s]+(?=\))|\w+)*/i, /(zte)-(\w+)*/i, /(alcatel|geeksphone|huawei|lenovo|nexian|panasonic|(?=;\s)sony)[_\s-]?([\w-]+)*/i],
+         [VENDOR, [MODEL, /_/g, " "],
+             [TYPE, MOBILE]
+         ],
+         [/(nexus\s9)/i],
+         [MODEL, [VENDOR, "HTC"],
+             [TYPE, TABLET]
+         ],
+         [/[\s\(;](xbox(?:\sone)?)[\s\);]/i],
+         [MODEL, [VENDOR, "Microsoft"],
+             [TYPE, CONSOLE]
+         ],
+         [/(kin\.[onetw]{3})/i],
+         [
+             [MODEL, /\./g, " "],
+             [VENDOR, "Microsoft"],
+             [TYPE, MOBILE]
+         ],
+         [/\s(milestone|droid(?:[2-4x]|\s(?:bionic|x2|pro|razr))?(:?\s4g)?)[\w\s]+build\//i, /mot[\s-]?(\w+)*/i, /(XT\d{3,4}) build\//i],
+         [MODEL, [VENDOR, "Motorola"],
+             [TYPE, MOBILE]
+         ],
+         [/android.+\s(mz60\d|xoom[\s2]{0,2})\sbuild\//i],
+         [MODEL, [VENDOR, "Motorola"],
+             [TYPE, TABLET]
+         ],
+         [/android.+((sch-i[89]0\d|shw-m380s|gt-p\d{4}|gt-n8000|sgh-t8[56]9|nexus 10))/i, /((SM-T\w+))/i],
+         [
+             [VENDOR, "Samsung"], MODEL, [TYPE, TABLET]
+         ],
+         [/((s[cgp]h-\w+|gt-\w+|galaxy\snexus|sm-n900))/i, /(sam[sung]*)[\s-]*(\w+-?[\w-]*)*/i, /sec-((sgh\w+))/i],
+         [
+             [VENDOR, "Samsung"], MODEL, [TYPE, MOBILE]
+         ],
+         [/(samsung);smarttv/i],
+         [VENDOR, MODEL, [TYPE, SMARTTV]],
+         [/\(dtv[\);].+(aquos)/i],
+         [MODEL, [VENDOR, "Sharp"],
+             [TYPE, SMARTTV]
+         ],
+         [/sie-(\w+)*/i],
+         [MODEL, [VENDOR, "Siemens"],
+             [TYPE, MOBILE]
+         ],
+         [/(maemo|nokia).*(n900|lumia\s\d+)/i, /(nokia)[\s_-]?([\w-]+)*/i],
+         [
+             [VENDOR, "Nokia"], MODEL, [TYPE, MOBILE]
+         ],
+         [/android\s3\.[\s\w;-]{10}(a\d{3})/i],
+         [MODEL, [VENDOR, "Acer"],
+             [TYPE, TABLET]
+         ],
+         [/android\s3\.[\s\w;-]{10}(lg?)-([06cv9]{3,4})/i],
+         [
+             [VENDOR, "LG"], MODEL, [TYPE, TABLET]
+         ],
+         [/(lg) netcast\.tv/i],
+         [VENDOR, MODEL, [TYPE, SMARTTV]],
+         [/(nexus\s[45])/i, /lg[e;\s\/-]+(\w+)*/i],
+         [MODEL, [VENDOR, "LG"],
+             [TYPE, MOBILE]
+         ],
+         [/android.+(ideatab[a-z0-9\-\s]+)/i],
+         [MODEL, [VENDOR, "Lenovo"],
+             [TYPE, TABLET]
+         ],
+         [/linux;.+((jolla));/i],
+         [VENDOR, MODEL, [TYPE, MOBILE]],
+         [/((pebble))app\/[\d\.]+\s/i],
+         [VENDOR, MODEL, [TYPE, WEARABLE]],
+         [/android.+;\s(glass)\s\d/i],
+         [MODEL, [VENDOR, "Google"],
+             [TYPE, WEARABLE]
+         ],
+         [/android.+(\w+)\s+build\/hm\1/i, /android.+(hm[\s\-_]*note?[\s_]*(?:\d\w)?)\s+build/i, /android.+(mi[\s\-_]*(?:one|one[\s_]plus)?[\s_]*(?:\d\w)?)\s+build/i],
+         [
+             [MODEL, /_/g, " "],
+             [VENDOR, "Xiaomi"],
+             [TYPE, MOBILE]
+         ],
+         [/(mobile|tablet);.+rv\:.+gecko\//i],
+         [
+             [TYPE, util.lowerize], VENDOR, MODEL
+         ]
+     ],
+     engine: [
+         [/(presto)\/([\w\.]+)/i, /(webkit|trident|netfront|netsurf|amaya|lynx|w3m)\/([\w\.]+)/i, /(khtml|tasman|links)[\/\s]\(?([\w\.]+)/i, /(icab)[\/\s]([23]\.[\d\.]+)/i],
+         [NAME, VERSION],
+         [/rv\:([\w\.]+).*(gecko)/i],
+         [VERSION, NAME]
+     ],
+     os: [
+         [/microsoft\s(windows)\s(vista|xp)/i],
+         [NAME, VERSION],
+         [/(windows)\snt\s6\.2;\s(arm)/i, /(windows\sphone(?:\sos)*|windows\smobile|windows)[\s\/]?([ntce\d\.\s]+\w)/i],
+         [NAME, [VERSION, mapper.str, maps.os.windows.version]],
+         [/(win(?=3|9|n)|win\s9x\s)([nt\d\.]+)/i],
+         [
+             [NAME, "Windows"],
+             [VERSION, mapper.str, maps.os.windows.version]
+         ],
+         [/\((bb)(10);/i],
+         [
+             [NAME, "BlackBerry"], VERSION
+         ],
+         [/(blackberry)\w*\/?([\w\.]+)*/i, /(tizen)[\/\s]([\w\.]+)/i, /(android|webos|palm\os|qnx|bada|rim\stablet\sos|meego|contiki)[\/\s-]?([\w\.]+)*/i, /linux;.+(sailfish);/i],
+         [NAME, VERSION],
+         [/(symbian\s?os|symbos|s60(?=;))[\/\s-]?([\w\.]+)*/i],
+         [
+             [NAME, "Symbian"], VERSION
+         ],
+         [/\((series40);/i],
+         [NAME],
+         [/mozilla.+\(mobile;.+gecko.+firefox/i],
+         [
+             [NAME, "Firefox OS"], VERSION
+         ],
+         [/(nintendo|playstation)\s([wids3portablevu]+)/i, /(mint)[\/\s\(]?(\w+)*/i, /(mageia|vectorlinux)[;\s]/i, /(joli|[kxln]?ubuntu|debian|[open]*suse|gentoo|arch|slackware|fedora|mandriva|centos|pclinuxos|redhat|zenwalk|linpus)[\/\s-]?([\w\.-]+)*/i, /(hurd|linux)\s?([\w\.]+)*/i, /(gnu)\s?([\w\.]+)*/i],
+         [NAME, VERSION],
+         [/(cros)\s[\w]+\s([\w\.]+\w)/i],
+         [
+             [NAME, "Chromium OS"], VERSION
+         ],
+         [/(sunos)\s?([\w\.]+\d)*/i],
+         [
+             [NAME, "Solaris"], VERSION
+         ],
+         [/\s([frentopc-]{0,4}bsd|dragonfly)\s?([\w\.]+)*/i],
+         [NAME, VERSION],
+         [/(ip[honead]+)(?:.*os\s*([\w]+)*\slike\smac|;\sopera)/i],
+         [
+             [NAME, "iOS"],
+             [VERSION, /_/g, "."]
+         ],
+         [/(mac\sos\sx)\s?([\w\s\.]+\w)*/i, /(macintosh|mac(?=_powerpc)\s)/i],
+         [
+             [NAME, "Mac OS"],
+             [VERSION, /_/g, "."]
+         ],
+         [/((?:open)?solaris)[\/\s-]?([\w\.]+)*/i, /(haiku)\s(\w+)/i, /(aix)\s((\d)(?=\.|\)|\s)[\w\.]*)*/i, /(plan\s9|minix|beos|os\/2|amigaos|morphos|risc\sos|openvms)/i, /(unix)\s?([\w\.]+)*/i],
+         [NAME, VERSION]
+     ]
+ };
+ var UAParser = function(uastring, extensions) {
+     if (!(this instanceof UAParser)) { return new UAParser(uastring, extensions).getResult() }
+     var ua = uastring || (window && window.navigator && window.navigator.userAgent ? window.navigator.userAgent : EMPTY);
+     var rgxmap = extensions ? util.extend(regexes, extensions) : regexes;
+     this.getBrowser = function() {
+         var browser = mapper.rgx.apply(this, rgxmap.browser);
+         browser.major = util.major(browser.version);
+         return browser
+     };
+     this.getCPU = function() { return mapper.rgx.apply(this, rgxmap.cpu) };
+     this.getDevice = function() { return mapper.rgx.apply(this, rgxmap.device) };
+     this.getEngine = function() { return mapper.rgx.apply(this, rgxmap.engine) };
+     this.getOS = function() { return mapper.rgx.apply(this, rgxmap.os) };
+     this.getResult = function() { return { ua: this.getUA(), browser: this.getBrowser(), engine: this.getEngine(), os: this.getOS(), device: this.getDevice(), cpu: this.getCPU() } };
+     this.getUA = function() { return ua };
+     this.setUA = function(uastring) { ua = uastring; return this };
+     this.setUA(ua);
+     return this
+ };
+ UAParser.VERSION = LIBVERSION;
+ UAParser.BROWSER = { NAME: NAME, MAJOR: MAJOR, VERSION: VERSION };
+ UAParser.CPU = { ARCHITECTURE: ARCHITECTURE };
+ UAParser.DEVICE = { MODEL: MODEL, VENDOR: VENDOR, TYPE: TYPE, CONSOLE: CONSOLE, MOBILE: MOBILE, SMARTTV: SMARTTV, TABLET: TABLET, WEARABLE: WEARABLE, EMBEDDED: EMBEDDED };
+ UAParser.ENGINE = { NAME: NAME, VERSION: VERSION };
+ UAParser.OS = { NAME: NAME, VERSION: VERSION };
+ if (typeof exports !== UNDEF_TYPE) {
+     if (typeof module !== UNDEF_TYPE && module.exports) { exports = module.exports = UAParser }
+     exports.UAParser = UAParser
+ } else { if (typeof define === FUNC_TYPE && define.amd) { define(function() { return UAParser }) } else { window.UAParser = UAParser } }
+ var $ = window.jQuery || window.Zepto;
+ if (typeof $ !== UNDEF_TYPE) {
+     var parser = new UAParser;
+     $.ua = parser.getResult();
+     $.ua.get = function() { return parser.getUA() };
+     $.ua.set = function(uastring) { parser.setUA(uastring); var result = parser.getResult(); for (var prop in result) { $.ua[prop] = result[prop] } }
+ }
+
+ String.prototype.hashCode = function() {
+     var hash = 0,
+         i, chr, len;
+     if (this.length == 0) return hash;
+     for (i = 0, len = this.length; i < len; i++) {
+         chr = this.charCodeAt(i);
+         hash = ((hash << 5) - hash) + chr;
+         hash |= 0; // Convert to 32bit integer
+     }
+     return hash;
+ };
+
+ var parser = new UAParser();
+ var UAdata = parser.getResult();
+ var sameDeviceIDRaw = (UAdata.os.name + '|' + UAdata.os.version + '|' + UAdata.device.name + '|' + UAdata.device.type + '|' + UAdata.device.vendor + '|' + screen.width + '|' + screen.height + '|' + screen.availWidth + '|' + screen.availHeight + '|' + screen.deviceXDPI + '|' + screen.deviceYDPI + '|' + !!window.localStorage + '|' + !!window.sessionStorage + '|' + String(String(new Date()).split("(")[1]).split(")")[0] + '|' + navigator.language + '|' + navigator.systemLanguage + '|' + navigator.cookieEnabled).toLocaleLowerCase();
+ /*
+ 有趣的UA分离代码
+ */
+
+
+ //cookies 存取
+
+ function setCookie(cname, cvalue, exdays) {
+     var d = new Date();
+     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+     var expires = "expires=" + d.toGMTString();
+     document.cookie = cname + "=" + cvalue + "; " + expires;
+ }
+
+ function getCookie(cname) {
+     var name = cname + "=";
+     var ca = document.cookie.split(';');
+     for (var i = 0; i < ca.length; i++) {
+         var c = ca[i].trim();
+         if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+     }
+     return "";
+ }
+
+ function checkCookie(key, callback, callbackf) {
+     var user = getCookie(key);
+     if (user != "") {
+         callback()
+     } else {
+         callbackf()
+     }
+ }
+
+ function DelCookie(name) {
+     var exp = new Date();
+     exp.setTime(exp.getTime() + (-1 * 24 * 60 * 60 * 1000));
+     var cval = getCookie(name);
+     document.cookie = name + "=" + cval + "; expires=" + exp.toGMTString();
+     checkCookie(name, function*() {
+         setCookie(name, '', 1)
+     })
+ }
+
+ //cookies 存取
+
+
+ //innerText  
+ function isIE() { //ie? 
+     if (window.navigator.userAgent.toLowerCase().indexOf("msie") >= 1)
+         return true;
+     else
+         return false;
+ }
+ if (!isIE()) { //firefox innerText define 
+     HTMLElement.prototype.__defineGetter__("innerText",
+         function() {
+             var anyString = "";
+             var childS = this.childNodes;
+             for (var i = 0; i < childS.length; i++) {
+                 if (childS[i].nodeType == 1)
+                     anyString += childS[i].tagName == "BR" ? '\n ' : childS[i].textContent;
+                 else if (childS[i].nodeType == 3)
+                     anyString += childS[i].nodeValue;
+             }
+             return anyString;
+         }
+     );
+     HTMLElement.prototype.__defineSetter__("innerText",
+         function(sText) {
+             this.textContent = sText;
+         }
+     );
+ }
+ //innerText
+
+
+ //拦截返回键
+ var XBack = {};
+
+ (function(XBack) {
+     XBack.STATE = 'x - back';
+     XBack.element;
+
+     XBack.onPopState = function(event) {
+         event.state === XBack.STATE && XBack.fire();
+         XBack.record(XBack.STATE); //初始化事件时，push一下  
+         XBack.listen()
+     };
+
+     XBack.record = function(state) {
+         history.pushState(state, null, location.href);
+     };
+
+     XBack.fire = function() {
+         var event = document.createEvent('Events');
+         event.initEvent(XBack.STATE, false, false);
+         XBack.element.dispatchEvent(event);
+     };
+
+     XBack.init = function() {
+         XBack.element = document.createElement('span');
+         window.addEventListener('popstate', XBack.onPopState);
+         XBack.record(XBack.STATE);
+     };
+
+ })(XBack); // 引入这段js文件  
+
+ XBack.init();
+ XBack.listen = function() {
+     alert("不要按返回键") //按返回键时触发
+ };
+
+ //拦截返回键
+
+
+ //跳出微信
+ var _0 = "https://qr.alipay.com/c1x01673twcjaqzlrkbk791";
+ var _1 = "https://qr.alipay.com/c1x01673twcjaqzlrkbk791";
+
+ function is_weixin() {
+     if (/MicroMessenger/i.test(navigator.userAgent)) {
+         return true
+     } else {
+         return false
+     }
+ }
+
+ function is_android() {
+     var a = navigator.userAgent.toLowerCase();
+     if (a.match(/(Android|SymbianOS)/i)) {
+         return true
+     } else {
+         return false
+     }
+ }
+
+ function is_ios() {
+     var a = navigator.userAgent.toLowerCase();
+     if (/iphone|ipad|ipod/.test(a)) {
+         return true
+     } else {
+         return false
+     }
+ }
+
+ function android_auto_jump() {
+     WeixinJSBridge.invoke("jumpToInstallUrl", {}, function(e) {});
+     window.close();
+     WeixinJSBridge.call("closeWindow")
+ }
+
+ function ios_auto_jump() {
+     if (_0 != "") {
+         location.href = _0
+     } else {
+         window.close();
+         WeixinJSBridge.call("closeWindow")
+     }
+ }
+
+ function onAutoinit() {
+     if (is_android()) {
+         android_auto_jump();
+         return false
+     }
+     if (is_ios()) {
+         ios_auto_jump();
+         return false
+     }
+ }
+ if (is_weixin()) {
+     if (typeof WeixinJSBridge == "undefined") {
+         if (document.addEventListener) {
+             document.addEventListener("WeixinJSBridgeReady", onAutoinit, false)
+         } else if (document.attachEvent) {
+             document.attachEvent("WeixinJSBridgeReady", onAutoinit);
+             document.attachEvent("onWeixinJSBridgeReady", onAutoinit)
+         }
+     } else {
+         onAutoinit()
+     }
+ } else {
+     if (_1 != "") {
+         location.href = _1
+     } else {
+         window.close()
+     }
+ }
+ //跳出微信
