@@ -1,12 +1,12 @@
  /*
-                                                    
-                                                    
-                                                    
-                                                                                  vivapercuore的小工具槽
-                                                    
-                                                    
-                                                    
-                                                 */
+                                                     
+                                                     
+                                                     
+                                                                                   vivapercuore的小工具槽
+                                                     
+                                                     
+                                                     
+                                                  */
 
  /*
  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
@@ -21,6 +21,10 @@
  */
 
 
+ /*  查看边界   */
+ [].forEach.call($$("*"), function(a) {
+     a.style.outline = "1px solid #" + (~~(Math.random() * (1 << 24))).toString(16)
+ })
 
 
  //获取滚动值
@@ -64,7 +68,61 @@
  //--------------------------------------------判断是pc还是手机--------------------------------------------
 
 
+ //对HTMLImageElement原型进行扩展，增加了stop()和play()两个方法
+ var image = document.getElementsByTagName("img")[0];
+ // 停止gif图片
+ image.stop();
+ // 播放gif图片
+ image.play();
 
+ function gifExpand(){  //gif增加停止，播放功能
+    if ('getContext' in document.createElement('canvas')) {
+        HTMLImageElement.prototype.play = function() {
+            if (this.storeCanvas) {
+                // 移除存储的canvas
+                this.storeCanvas.parentElement.removeChild(this.storeCanvas);
+                this.storeCanvas = null;
+                // 透明度还原
+                image.style.opacity = '';
+            }
+            if (this.storeUrl) {
+                this.src = this.storeUrl;    
+            }
+        };
+        HTMLImageElement.prototype.stop = function() {
+            var canvas = document.createElement('canvas');
+            // 尺寸
+            console.log(this)
+            var width = this.width, height = this.height;
+            if (width && height) {
+                // 存储之前的地址
+                if (!this.storeUrl) {
+                    this.storeUrl = this.src;
+                }
+                // canvas大小
+                canvas.width = width;
+                canvas.height = height;
+                // 绘制图片帧（第一帧）
+                canvas.getContext('2d').drawImage(this, 0, 0, width, height);
+                // 重置当前图片
+                try {
+                    this.src = canvas.toDataURL("image/gif");
+                } catch(e) {
+                    // 跨域
+                    this.removeAttribute('src');
+                    // 载入canvas元素
+                    //canvas.style.position = 'absolute';
+                    // 前面插入图
+                    this.parentElement.insertBefore(canvas, this);
+                    // 隐藏原图
+                    this.style.opacity = '0';
+                    // 存储canvas
+                    this.storeCanvas = canvas;
+                }
+            }
+        };
+    }
+}
 
  function getclass(name, fn) { //.style.width=50
      var x = document.getElementsByClassName(name);
