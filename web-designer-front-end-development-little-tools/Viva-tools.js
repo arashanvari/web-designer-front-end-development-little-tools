@@ -1,12 +1,12 @@
  /*
-                                                     
-                                                     
-                                                     
-                                                                                   vivapercuore的小工具槽
-                                                     
-                                                     
-                                                     
-                                                  */
+                                                                 
+                                                                 
+                                                                 
+                                                                                               vivapercuore的小工具槽
+                                                                 
+                                                                 
+                                                                 
+                                                              */
 
  /*
  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
@@ -22,9 +22,8 @@
 
 
  /*  查看边界   */
- [].forEach.call($$("*"), function(a) {
-     a.style.outline = "1px solid #" + (~~(Math.random() * (1 << 24))).toString(16)
- })
+
+ [].forEach.call($$("*"), function(a) { a.style.outline = "1px solid #" + (~~(Math.random() * (1 << 24))).toString(16) })
 
 
  //获取滚动值
@@ -35,6 +34,16 @@
  //获取滚动值
 
 
+ // toast
+ var toast = $("<div style='opacity:1;transition: all 2s linear;bottom: 10%;margin: 0 auto;text-align: center;position: fixed;font-size:15px;left: 50%;transform: translateX(-50%);color: #fff;background-color: #282828;padding: 5px;border-radius: 10px;'></div>").text("每天最多可以邀请3人，明天再邀请吧~").css("position", "fixed")
+ $("body").append(toast)
+ setTimeout(() => {
+     toast.css("opacity", "0")
+     setTimeout(() => {
+         toast.remove()
+     }, 2000);
+ }, 1000);
+
  //--------------------------------------------获取浏览器宽高-----------------------------------------------------
  var w = window.innerWidth ||
      document.documentElement.clientWidth ||
@@ -43,7 +52,6 @@
  var h = window.innerHeight ||
      document.documentElement.clientHeight ||
      document.body.clientHeight;
-
  window.addEventListener("resize", resize)
 
  function resize() {
@@ -75,54 +83,54 @@
  // 播放gif图片
  image.play();
 
- function gifExpand(){  //gif增加停止，播放功能
-    if ('getContext' in document.createElement('canvas')) {
-        HTMLImageElement.prototype.play = function() {
-            if (this.storeCanvas) {
-                // 移除存储的canvas
-                this.storeCanvas.parentElement.removeChild(this.storeCanvas);
-                this.storeCanvas = null;
-                // 透明度还原
-                image.style.opacity = '';
-            }
-            if (this.storeUrl) {
-                this.src = this.storeUrl;    
-            }
-        };
-        HTMLImageElement.prototype.stop = function() {
-            var canvas = document.createElement('canvas');
-            // 尺寸
-            console.log(this)
-            var width = this.width, height = this.height;
-            if (width && height) {
-                // 存储之前的地址
-                if (!this.storeUrl) {
-                    this.storeUrl = this.src;
-                }
-                // canvas大小
-                canvas.width = width;
-                canvas.height = height;
-                // 绘制图片帧（第一帧）
-                canvas.getContext('2d').drawImage(this, 0, 0, width, height);
-                // 重置当前图片
-                try {
-                    this.src = canvas.toDataURL("image/gif");
-                } catch(e) {
-                    // 跨域
-                    this.removeAttribute('src');
-                    // 载入canvas元素
-                    //canvas.style.position = 'absolute';
-                    // 前面插入图
-                    this.parentElement.insertBefore(canvas, this);
-                    // 隐藏原图
-                    this.style.opacity = '0';
-                    // 存储canvas
-                    this.storeCanvas = canvas;
-                }
-            }
-        };
-    }
-}
+ function gifExpand() { //gif增加停止，播放功能
+     if ('getContext' in document.createElement('canvas')) {
+         HTMLImageElement.prototype.play = function() {
+             if (this.storeCanvas) {
+                 // 移除存储的canvas
+                 this.storeCanvas.parentElement.removeChild(this.storeCanvas);
+                 this.storeCanvas = null;
+                 // 透明度还原
+                 image.style.opacity = '';
+             }
+             if (this.storeUrl) {
+                 this.src = this.storeUrl;
+             }
+         };
+         HTMLImageElement.prototype.stop = function() {
+             var canvas = document.createElement('canvas');
+             // 尺寸
+             var width = this.width,
+                 height = this.height;
+             if (width && height) {
+                 // 存储之前的地址
+                 if (!this.storeUrl) {
+                     this.storeUrl = this.src;
+                 }
+                 // canvas大小
+                 canvas.width = width;
+                 canvas.height = height;
+                 // 绘制图片帧（第一帧）
+                 canvas.getContext('2d').drawImage(this, 0, 0, width, height);
+                 // 重置当前图片
+                 try {
+                     this.src = canvas.toDataURL("image/gif");
+                 } catch (e) {
+                     // 跨域
+                     this.removeAttribute('src');
+                     // 载入canvas元素
+                     //canvas.style.position = 'absolute';
+                     // 前面插入图
+                     this.parentElement.insertBefore(canvas, this);
+                     // 隐藏原图
+                     this.style.opacity = '0';
+                     // 存储canvas
+                     this.storeCanvas = canvas;
+                 }
+             }
+         };
+     }
+ }
 
  function getclass(name, fn) { //.style.width=50
      var x = document.getElementsByClassName(name);
@@ -131,6 +139,27 @@
          fn(x[i])
      }
  }
+
+ /*
+  @keyframes loading{
+     from {transform: rotateX(0deg);}
+     to {transform: rotateX(360deg);}
+ }
+
+ .loading{
+     animation: loading 1 linear infinite;
+     background-repeat: no-repeat;
+     background-size: contain;
+     background-position: center;
+     background-image: url("data:image/png;base64,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");
+ }
+
+
+ loading 动画
+ */
+
+
+
 
 
  //--------------------------------------------获取浏览器滚动条大小--------------------------------------------
@@ -154,6 +183,27 @@
  }
 
  //--------------------------------------------获取元素的左上角在页面中距离整个页面顶端和左边的距离--------------------------------------------
+ element.getBoundingClientRect() //获取元素左上角离屏幕左上角距离
+
+ function getObjXy(obj) { //html元素相对于视窗的位置集合
+     var xy = obj.getBoundingClientRect();
+     var top = xy.top - document.documentElement.clientTop + document.documentElement.scrollTop, //document.documentElement.clientTop 在IE67中始终为2，其他高级点的浏览器为0
+         bottom = xy.bottom,
+         left = xy.left - document.documentElement.clientLeft + document.documentElement.scrollLeft, //document.documentElement.clientLeft 在IE67中始终为2，其他高级点的浏览器为0
+         right = xy.right,
+         width = xy.width || right - left, //IE67不存在width 使用right - left获得
+         height = xy.height || bottom - top;
+     return {
+         top: top,
+         right: right,
+         bottom: bottom,
+         left: left,
+         width: width,
+         height: height
+     }
+ }
+
+
  function getElementLeft(element) {　　
      var actualLeft = element.offsetLeft;　　
      var current = element.offsetParent;　　
@@ -190,6 +240,38 @@
 
 
 
+ //进入全屏
+ function requestFullScreen() {
+     var de = document.documentElement;
+     if (de.requestFullscreen) {
+         de.requestFullscreen();
+     } else if (de.mozRequestFullScreen) {
+         de.mozRequestFullScreen();
+     } else if (de.webkitRequestFullScreen) {
+         de.webkitRequestFullScreen();
+     }
+ }
+ //退出全屏
+ function exitFullscreen() {
+     var de = document;
+     if (de.exitFullscreen) {
+         de.exitFullscreen();
+     } else if (de.mozCancelFullScreen) {
+         de.mozCancelFullScreen();
+     } else if (de.webkitCancelFullScreen) {
+         de.webkitCancelFullScreen();
+     }
+ }
+
+   //是否处于全屏中
+ function isFullscreen() {
+     return document.fullscreenElement ||
+         document.msFullscreenElement ||
+         document.mozFullScreenElement ||
+         document.webkitFullscreenElement || false;
+ }
+
+
  //--------------------------------------------封装原生ajax--------------------------------------------
  /*
   * 封装ajax函数
@@ -219,9 +301,10 @@
      }
      var postData = params.join('&');
      if (opt.method.toUpperCase() === 'POST') {
+         xmlHttp.withCredentials = true;
          xmlHttp.open(opt.method, opt.url, opt.async);
          xmlHttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=utf-8');
-         xmlHttp.send(postData);
+         xmlHttp.send(postData); // JQ 中：xhrFields:{withCredentials: true},    用于跨域时附带cookies信息防止错误
      } else if (opt.method.toUpperCase() === 'GET') {
          xmlHttp.open(opt.method, opt.url + '?' + postData, opt.async);
          xmlHttp.send(null);
@@ -257,6 +340,48 @@
 
  var charset = document.characterSet ? document.characterSet : document.charset;
  //判读网页编码
+
+
+
+
+ //js深拷贝
+ function DeepCopy(obj) {
+     // Hash表 记录所有的对象引用关系
+     let map = new WeakMap();
+
+     function dp(obj) {
+         let result = null;
+         let keys = null,
+             key = null,
+             temp = null,
+             existObj = null;
+
+         existObj = map.get(obj);
+         // 如果这个对象已被记录则直接返回
+         if (existObj) {
+             return existObj;
+         }
+         keys = Object.keys(obj);
+         result = {};
+         // 记录当前对象
+         map.set(obj, result);
+         for (let i = 0; i < keys.length; i++) {
+             key = keys[i];
+             temp = obj[key];
+             // 如果字段的值也是一个对象则递归复制
+             if (temp && typeof temp === 'object') {
+                 result[key] = dp(temp);
+             } else {
+                 // 否则直接赋值给新对象
+                 result[key] = temp;
+             }
+         }
+         return result;
+     }
+     return dp(obj);
+ }
+ //js深拷贝
+
 
 
  //----------------------检测是否微信----------------------------
