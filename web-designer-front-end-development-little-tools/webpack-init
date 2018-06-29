@@ -1,0 +1,70 @@
+cnpm init
+cnpm install --save-dev webpack
+cnpm install --save-dev webpack-dev-server
+cnpm install --save-dev babel-core babel-loader babel-preset-env babel-preset-react
+cnpm install file-loader css-loader style-loader sass-loader ejs-loader html-loader jsx-loader image-webpack-loader --save-dev
+cnpm install --save-dev style-loader css-loader
+cnpm install --save-dev postcss-loader autoprefixer
+
+
+
+
+package.json
+   add
+
+   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",  //测试
+    "start": "webpack",  //编译
+    "server": "webpack-dev-server --open"  //启动本地服务器
+  },
+
+
+npm run server
+
+
+webpack.config.js
+
+module.exports = {
+    devtool: 'source-map',
+    entry: __dirname + "/app/main.js", //已多次提及的唯一入口文件
+    output: {
+        path: __dirname + "/public", //打包后的文件存放的地方
+        filename: "bundle.js" //打包后输出文件的文件名
+    },
+    devServer: {
+        contentBase: "./public", //本地服务器所加载的页面所在的目录
+        historyApiFallback: true, //不跳转
+        inline: true //实时刷新
+    },
+    module: {
+        rules: [   
+            {           //babel 使用的规则
+                test: /(\.jsx|\.js)$/,
+                use: {
+                    loader: "babel-loader",
+                    options: {
+                        presets: [
+                            "env", "react"
+                        ]
+                    }
+                },
+                exclude: /node_modules/
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    {
+                        loader: "style-loader"
+                    }, {
+                        loader: "css-loader",
+                        options: {
+                            modules: true
+                        }
+                    }, {
+                        loader: "postcss-loader"
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -8,7 +8,6 @@
     var scale = 0;
     var tid;
     var flexible = lib.flexible || (lib.flexible = {});
-
     if (metaEl) {
         console.warn('将根据已有的meta标签来设置缩放比例');
         var match = metaEl.getAttribute('content').match(/initial\-scale=([\d\.]+)/);
@@ -31,7 +30,6 @@
             }
         }
     }
-
     if (!dpr && !scale) {
         var isAndroid = win.navigator.appVersion.match(/android/gi);
         var isIPhone = win.navigator.appVersion.match(/iphone/gi);
@@ -49,7 +47,6 @@
         }
         scale = 1 / dpr;
     }
-
     docEl.setAttribute('data-dpr', dpr);
     if (!metaEl) {
         metaEl = doc.createElement('meta');
@@ -73,7 +70,6 @@
         docEl.style.fontSize = rem + 'px';
         flexible.rem = win.rem = rem;
     }
-
     win.addEventListener('resize', function() {
         clearTimeout(tid);
         tid = setTimeout(refreshRem, 300);
@@ -84,7 +80,6 @@
             tid = setTimeout(refreshRem, 300);
         }
     }, false);
-
     if (doc.readyState === 'complete') {
         doc.body.style.fontSize = 12 * dpr + 'px';
     } else {
@@ -92,10 +87,7 @@
             doc.body.style.fontSize = 12 * dpr + 'px';
         }, false);
     }
-
-
     refreshRem();
-
     flexible.dpr = win.dpr = dpr;
     flexible.refreshRem = refreshRem;
     flexible.rem2px = function(d) {
@@ -112,6 +104,5 @@
         }
         return val;
     }
-
 })(window, window['lib'] || (window['lib'] = {}));
 //移动端自适应
