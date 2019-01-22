@@ -17,7 +17,9 @@
 
 /*  查看边界   */
 
-[].forEach.call($$("*"), function(a) { a.style.outline = "1px solid #" + (~~(Math.random() * (1 << 24))).toString(16) })
+[].forEach.call($$("*"), function(a) { a.style.outline = "1px solid #" + (~~(Math.random() * (1 << 24))).toString(16) });
+
+[].forEach.call(document.querySelectorAll("*"), function(a) { a.style.outline = "1px solid #" + (~~(Math.random() * (1 << 24))).toString(16) });
 
 
 //获取滚动值
@@ -29,66 +31,26 @@ function getscroll() {
 
 //----------------------------------------------------fetch 封装
 
-/**
- * 将对象转成 a=1&b=2的形式
- * @param obj 对象
- */
-function obj2String(obj, arr = [], idx = 0) {
-    for (let item in obj) {
-        arr[idx++] = [item, obj[item]]
-    }
-    return new URLSearchParams(arr).toString()
-}
+postData('http://example.com/answer', {answer: 42})
+  .then(data => console.log(data)) // JSON from `response.json()` call
+  .catch(error => console.error(error))
 
-/**
- * 真正的请求
- * @param url 请求地址
- * @param options 请求参数
- * @param method 请求方式
- */
-function commonFetcdh(url, options, method = 'GET') {
-    const searchStr = obj2String(options)
-    let initObj = {}
-    if (method === 'GET') { // 如果是GET请求，拼接url
-        url += '?' + searchStr
-        initObj = {
-            method: method,
-            credentials: 'include'
-        }
-    } else {
-        initObj = {
-            method: method,
-            credentials: 'include',
-            headers: new Headers({
-                'Accept': 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }),
-            body: searchStr
-        }
-    }
-    fetch(url, initObj).then((res) => {
-        return res.json()
-    }).then((res) => {
-        return res
-    })
-}
-
-/**
- * GET请求
- * @param url 请求地址
- * @param options 请求参数
- */
-function GET(url, options) {
-    return commonFetcdh(url, options, 'GET')
-}
-
-/**
- * POST请求
- * @param url 请求地址
- * @param options 请求参数
- */
-function POST(url, options) {
-    return commonFetcdh(url, options, 'POST')
+function postData(url, data) {
+  // Default options are marked with *
+  return fetch(url, {
+    body: JSON.stringify(data), // must match 'Content-Type' header
+    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: 'same-origin', // include, same-origin, *omit
+    headers: {
+      'user-agent': 'Mozilla/4.0 MDN Example',
+      'content-type': 'application/json'
+    },
+    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    mode: 'cors', // no-cors, cors, *same-origin
+    redirect: 'follow', // manual, *follow, error
+    referrer: 'no-referrer', // *client, no-referrer
+  })
+  .then(response => response.json()) // parses response to JSON
 }
 
 //----------------------------------------------------fetch 封装
@@ -133,16 +95,37 @@ game.prototype.emit = function(eventName, ...args) {
 
 
 // toast
-let msg=""
-var toast = $("<div style='opacity:1;transition: all 2s linear;bottom: 10%;margin: 0 auto;text-align: center;position: fixed;font-size:15px;left: 50%;transform: translateX(-50%);color: #fff;background-color: #282828;padding: 5px;border-radius: 10px;'></div>").text(msg).css("position", "fixed")
-$("body").append(toast)
-setTimeout(() => {
-    toast.css("opacity", "0")
-    setTimeout(() => {
-        toast.remove()
-    }, 2000);
-}, 1000);
-
+function toast(msg, duration, height) { //字符串   显示多久   显示位置距离顶部高度
+    duration = isNaN(duration) ? 2000 : duration; //2000是默认显示时长
+    let m = document.createElement('div');
+    m.innerHTML = msg;
+    m.className = "toast";
+    m.style.top = height || "50%"
+    m.style.minWidth = "10vw"
+    m.style.background = "#000"
+    m.style.opacity = "0.75"
+    m.style.color = "#fff"
+    m.style.lineHeight = " 5vw"
+    m.style.fontSize = "3.6vw"
+    m.style.textAlign = "center"
+    m.style.borderRadius = "2vw"
+    m.style.position = "fixed"
+    m.style.index = "999999"
+    m.style.left = "50%"
+    m.style.transform = "translateX(-50%)"
+    m.style.fontWeight = "500"
+    m.style.padding = " 3vw 4.1vw"
+    m.style.wordWrap = "break-word"
+    m.style.width = "70vw"
+    m.style.zIndex = "9999999"
+    document.body.appendChild(m);
+    setTimeout(function () {
+        var d = 0.5; //设置渐隐时长
+        m.style.transition = 'transform ' + d + 's ease-in, opacity ' + d + 's ease-in';
+        m.style.opacity = '0';
+        setTimeout(function () { document.body.removeChild(m) }, d * 1000);
+    }, duration);
+}
 
 var full = {
     //全屏代码

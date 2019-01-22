@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')  //引入html
 const MiniCssExtractPlugin = require("mini-css-extract-plugin"); //分离css
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");//压缩css
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");//压缩js
-const CleanWebpackPlugin = require('clean-webpack-plugin' );//清空残余hash文件
+const CleanWebpackPlugin = require('clean-webpack-plugin');//清空残余hash文件
 
 //注释此处分离外部js|css  1/3
 const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');//内联css和js
@@ -86,14 +86,31 @@ module.exports = {
         use: {
           loader: "babel-loader",
           options: {
-            "presets": ['env',]
+            "presets": [
+              ["@babel/preset-env", {
+                "modules": false,
+                "targets": {
+                  "browsers": ["> 1%", "last 2 versions", "not ie <= 8"]
+                },
+                "useBuiltIns": "usage"
+              }]
+            ],
           }
         },
         exclude: /node_modules/
+      }, {
+        test: /\.html$/,
+        loader: 'html-withimg-loader'
       },{
-        　　　　　　test: /\.html$/,
-        　　　　　　loader: 'html-withimg-loader'
-        　　　　}
+        test: require.resolve('jquery'),
+        use: [{
+           loader: 'expose-loader',
+           options: 'jQuery'
+        },{
+           loader: 'expose-loader',
+           options: '$'
+        }]
+     }
     ]
   },
   plugins: [
@@ -114,7 +131,7 @@ module.exports = {
         removeComments: true,//去除注释
         removeEmptyAttributes: true,//去除空属性
         collapseWhitespace: true, // 删除空格
-        preserveLineBreaks: false // 删除换行
+        preserveLineBreaks: true // 删除换行
       },
       inlineSource: '.(js|css)$'//内联选择器
     }),
