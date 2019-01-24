@@ -1032,3 +1032,18 @@ XBack.listen = function() {
 };
 
 //拦截返回键
+
+
+
+
+// 最佳的打乱算法是Fisher-Yates算法，下面是一个简单实现
+const arr = [0, 1, 2, 3, 4];
+for (let i = 1; i < arr.length; i++) {
+    const random = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[random]] = [arr[random], arr[i]];
+}
+
+// 作者：troy351
+// 链接：https://www.zhihu.com/question/68330851/answer/262111061
+// 来源：知乎
+// 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
